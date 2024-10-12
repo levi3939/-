@@ -278,17 +278,42 @@ def process_orders_with_ai(order_input: str):
         
         result = response.choices[0].message.content
         logging.info(f"AI返回的原始结果: {result}")
-        
-        # 移除可能的Markdown代码块标记
+ 
+        # 清理结果
         result = re.sub(r'```json\n?|\n?```', '', result).strip()
+        result = result.replace('\n', '').replace('\r', '')
         
-        # 尝试解析JSON，如果失败，记录错误
         try:
             parsed_result = json.loads(result)
             logging.info("AI返回的结果是有效的JSON格式")
             return parsed_result
         except json.JSONDecodeError as e:
             logging.error(f"AI返回的结果不是有效的JSON格式: {str(e)}")
+            logging.error(f"问题字符串: {result[max(0, e.pos-20):min(len(result), e.pos+20)]}")
+            logging.error(f"错误位置: {e.pos}")
+       
+            # 尝试手动解析
+            orders = []
+            for i, line in enumerate(result.split('},{')):
+                if line.strip():
+                    try:
+                        # 确保每个部分都是完整的JSON对象
+                        if i == 0:
+                            line = line + '}'
+                        elif i == len(result.split('},{')) - 1:
+                            line = '{' + line
+                        else:
+                            line = '{' + line + '}'
+                        
+                        order = json.loads(line)
+                        orders.append(order)
+                    except json.JSONDecodeError as sub_e:
+                        logging.error(f"无法解析第 {i+1} 个订单: {line}")
+                        logging.error(f"错误详情: {str(sub_e)}")
+                        logging.error(f"问题字符串: {line[max(0, sub_e.pos-20):min(len(line), sub_e.pos+20)]}")
+            if orders:
+                logging.info(f"手动解析成功，共解析 {len(orders)} 个订单")
+                return orders
             return None
     except Exception as e:
         logging.error(f"调用DeepSeek API时出错: {str(e)}")
