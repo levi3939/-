@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="zh">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>订单处理系统</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <div id="app">
+        <h1>订单处理系统</h1>
+        
+        <div id="order-processing">
+            <h2>订单处理</h2>
+            <textarea id="order-input" placeholder="请输入订单信息" rows="10"></textarea>
+            <input type="text" id="user-address" placeholder="请输入目标地址">
+            <button onclick="processOrder()">处理并解码</button>
+            <button onclick="calculateRoute()">计算路线</button>
+            <button onclick="saveToDb()">保存到数据库</button>
+            <button onclick="cleanDuplicateData()">清理重复数据</button>
+            <button onclick="cleanInvalidData()">清理无效数据</button>
+            <button onclick="copyResult()">复制结果</button>
+            <div id="loading" class="loading" style="display: none;">处理中，请稍候...</div>
+            <div id="result" class="result-box"></div>
+        </div>
+
+        <div id="order-recommendation">
+            <h2>订单推荐</h2>
+            <input type="text" id="start-address" placeholder="请输入出发地址">
+            <button onclick="recommendOrders()">推荐订单</button>
+            <div id="recommendation-result" class="result-box"></div>
+        </div>
+    </div>
+
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>

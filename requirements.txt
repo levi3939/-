@@ -1,0 +1,6 @@
+requests==2.26.0
+pyperclip==1.8.2
+mysql-connector-python==8.0.27
+overpy==0.6
+openai==0.27.0
+tkinter  # 通常包含在Python标准库中，不需要单独安装
